@@ -11,7 +11,7 @@ function handleEvent(e) {
     let searchInput = mySearch.value ;
     console.log(searchInput);
     getWipediaLinks(searchInput) ;
-    wikiResult.innerHTML = "";
+    wikiResult.textContent = "";
 }
 
 async function getWipediaLinks (searchInput) {
@@ -22,7 +22,7 @@ async function getWipediaLinks (searchInput) {
             document.getElementById('warning').textContent = "" ;
             const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&origin=*&srlimit=20&srsearch=${searchInput}` ;
             try {
-                loading.style = "visibility: visible" ;
+                loading.style = "display: block" ;
                 var requete = await fetch (url) ;
             } 
             catch (error) {
@@ -32,15 +32,25 @@ async function getWipediaLinks (searchInput) {
             }
             if (requete.ok) {
                 let data = await requete.json() ;
-                loading.style = "visibility: hidden" ;
+                loading.style = "display: none" ;
                 console.log("resultat des data recuperer" , data);
                 let results = data.query.search ;
-                console.log("resultat du search dans json" , results) ;
-                showResult(results)
+
+                if (! results.length) {
+                    console.log("Votre recherche ne contient pas de resultat");
+                    document.getElementById('warning').innerHTML = "<p class ='text-dark'>Votre recherche ne contient pas de resultat</p>";
+                    return
+                } else {
+                    console.log("resultat du search dans json" , results) ;
+                    showResult(results) ;
+                }
+            
             }
             else {
                 console.log(" Oops Un probleme est survenue avec le serveur de Wikipedia , Ressayez plustard") ;
                 console.log("HTTP Error : " , requete.status) ;
+                document.getElementById('warning').textContent = `HTTP Error : ${requete.status}` ;
+                loading.style = "display: none" ;
             }
             
     }
@@ -48,9 +58,10 @@ async function getWipediaLinks (searchInput) {
 }
 
 function showResult (results) {
-    let x = [] ;
     results.forEach((result , index) => {
         let div = document.createElement('div') ;
+        div.className = "fs-6 fw-medium" ;
+        div.style = `overflow-wrap: break-word;` ;
         wikiResult.append(div);
         let link = `https://en.wikipedia.org/?curid=${result.pageid}` ;
         const resultats = `<div class ="mt-3"> 

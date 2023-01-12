@@ -11085,5 +11085,5 @@ input:focus {
 }
 
 #loading {
-  visibility: hidden;
+  display: none;
 }/*# sourceMappingURL=style.css.map */
